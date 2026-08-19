@@ -1,21 +1,22 @@
-import { AppHeader } from "@/components/organisms/AppHeader"
-import { CtaSection } from "@/sections/landing/CtaSection"
-import { FeaturesSection } from "@/sections/landing/FeaturesSection"
+// import { DashboardHeader } from "@/components/organisms/DashboardHeader"
 import { HeroSection } from "@/sections/landing/HeroSection"
-import { LandingFooterSection } from "@/sections/landing/LandingFooterSection"
-import { StatsSection } from "@/sections/landing/StatsSection"
+import { AboutSection } from "@/sections/landing/AboutSection"
+import { InfoSection } from "@/sections/landing/InfoSection"
+import { ResourcesSection } from "@/sections/landing/ResourcesSection"
+
+
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <AppHeader action="dashboard" />
+      {/* <DashboardHeader action="dashboard" /> */}
       <main className="flex-1">
         <HeroSection />
-        <FeaturesSection />
-        <StatsSection />
-        <CtaSection />
+        <AboutSection />
+        <InfoSection />
+
       </main>
-      <LandingFooterSection />
+      <ResourcesSection />
     </div>
   )
 }

@@ -1,5 +1,7 @@
 "use client"
 
+
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useRef } from "react"
 import dynamic from "next/dynamic"
 import type { Occurrence } from "@/entities/occurrence/occurrence.types"
@@ -16,13 +18,13 @@ import { HostPanel } from "@/features/hosts/components/HostPanel/HostPanel"
 import { LocationSearch } from "@/features/locations/components/LocationSearch/LocationSearch"
 import { OccurrencePanel } from "@/features/occurrences/components/OccurrencePanel/OccurrencePanel"
 import { VectorPanel } from "@/features/vectors/components/VectorPanel/VectorPanel"
-import { DashboardShell } from "@/components/layouts/DashboardShell"
+import { DashboardShell } from "@/components/layout/DashboardShell"
 import {
   SideboardToolbar,
   type SideboardToolbarPanel,
-} from "@/components/organisms/SideboardToolbar"
-import { MapLegend } from "@/components/organisms/MapLegend"
-import { MapTelemetryOverlay } from "@/components/organisms/MapTelemetryOverlay"
+} from "@/modules/dashboard/components/SideboardToolbar"
+import { MapLegend } from "@/modules/map/components/MapLegend"
+import { MapTelemetryOverlay } from "@/modules/map/components/MapTelemetryOverlay"
 import { DashboardFooterSection } from "@/sections/dashboard/DashboardFooterSection"
 
 const LeafletMap = dynamic(() => import("@/features/map/components/LeafletMap/LeafletMap"), {
@@ -59,6 +61,8 @@ export default function DashboardPage() {
     vectors: DEFAULT_SELECTED_VECTORS,
     hosts: [] as string[],
   })
+
+  
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {

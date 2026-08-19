@@ -1,29 +1,67 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+"use client";
+
+import { useRouter } from "next/navigation";
+
+import { SearchForm } from "@/modules/search/components/SearchForm";
+import { AdvancedSearchToggle } from "@/modules/search/components/AdvancedSearchToggle";
+import { useSearchNavigation } from "@/modules/search/hooks/useDashboardSearch";
+import { buildSearchParams } from "@/modules/search/utils/buildSearchParams";
 
 export function HeroSection() {
+
+const { navigateToSearch } = useSearchNavigation();
+  
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-primary/5 to-background">
-      <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-primary/10 text-primary text-sm font-medium mb-6">
-            <span className="w-2 h-2 rounded-none bg-accent animate-pulse" />
-            Plataforma Cientifica
-          </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 text-balance">
-            Monitoramento da Distribuição de <span className="text-primary">Doenças Parasitárias</span> no Brasil
-          </h2>
-          <p className="text-lg text-muted-foreground mb-8 leading-relaxed text-pretty">
-            Plataforma dedicada ao mapeamento e análise da distribuição de doenças parasitárias no território brasileiro,
-            fornecendo dados científicos para pesquisadores e profissionais das áreas de saúde animal, saúde humana e parasitologia.
-          </p>
-          <div className="flex justify-center">
-            <Button size="lg" asChild>
-              <Link href="/dashboard">Visualizar Plataforma</Link>
-            </Button>
-          </div>
+    <section className="border-t border-border bg-white">
+      <div className="mx-auto flex max-w-5xl flex-col items-center px-6 py-14">
+
+        {/* Logo */}
+
+        <img
+          src="/sidpb/logo.svg"
+          alt="Logo"
+          width={250}
+          height={250}
+        />
+
+        {/* Titulo */}
+        <p
+          className="
+            mt-3
+            text-center
+            text-[22px]
+            font-Merriweather
+            uppercase
+            tracking-[0.08em]
+            leading-[1.45]
+            text-neutral-500
+          "
+        >
+          <span className="block">
+            Sistema de Informação de
+          </span>
+
+          <span className="block">
+            Doenças Parasitárias no Brasil
+          </span>
+        </p>
+
+
+        {/* Search */}
+
+        <div className="mt-10 w-full max-w-4xl">
+
+          <SearchForm
+              onSearch={navigateToSearch}
+          />
+
+          <AdvancedSearchToggle />
+
         </div>
+
       </div>
     </section>
-  )
+
+    
+  );
 }
