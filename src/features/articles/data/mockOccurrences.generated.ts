@@ -2,6 +2,8 @@
 // Observações: fonte/ocorrencia_fonte estão vazias, então articles fica como [].
 // Longitude/latitude estavam nulas no SQL; coordenadas abaixo são aproximações por cidade/UF quando possível.
 
+import type { Occurrence } from "@/entities/occurrence/occurrence.types";
+
 export const mockOccurrences: Occurrence[] = [
   {
     id: "occ-001",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
 
 interface UseApiQueryOptions<T> {
   enabled?: boolean;
@@ -20,7 +20,7 @@ function resolveFallback<T>(fallback?: T | (() => T)) {
     return (fallback as () => T)();
   }
 
-  return fallback ?? null;
+  return fallback;
 }
 
 export function useApiQuery<T>(
@@ -29,52 +29,24 @@ export function useApiQuery<T>(
   options: UseApiQueryOptions<T> = {}
 ): UseApiQueryResult<T> {
   const { enabled = true, fallbackData, keepPreviousData = true } = options;
-  const [data, setData] = useState<T | null>(() => resolveFallback(fallbackData));
-  const [isLoading, setIsLoading] = useState(enabled);
-  const [error, setError] = useState<Error | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
-  const queryFnRef = useRef(queryFn);
-  const fallbackDataRef = useRef(fallbackData);
-  const keepPreviousDataRef = useRef(keepPreviousData);
-  const stableKey = useMemo(() => JSON.stringify(queryKey), [queryKey]);
+  const fallback = resolveFallback(fallbackData);
 
-  useEffect(() => {
-    queryFnRef.current = queryFn;
-    fallbackDataRef.current = fallbackData;
-    keepPreviousDataRef.current = keepPreviousData;
-  }, [fallbackData, keepPreviousData, queryFn]);
+  const queryOptions: UseQueryOptions<T, Error, T, readonly unknown[]> = {
+    queryKey,
+    queryFn: ({ signal }) => queryFn(signal),
+    enabled,
+    placeholderData: (previousData) =>
+      keepPreviousData ? previousData ?? fallback : fallback,
+  } as UseQueryOptions<T, Error, T, readonly unknown[]>;
 
-  const execute = useCallback(async () => {
-    if (!enabled) {
-      setIsLoading(false);
-      return;
-    }
+  const query = useQuery<T, Error, T, readonly unknown[]>(queryOptions);
 
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-
-    setIsLoading(true);
-    if (!keepPreviousDataRef.current) setData(resolveFallback(fallbackDataRef.current));
-
-    try {
-      const response = await queryFnRef.current(controller.signal);
-      setData(response);
-      setError(null);
-    } catch (err) {
-      if (controller.signal.aborted) return;
-      setError(err instanceof Error ? err : new Error("Erro desconhecido na requisicao."));
-      const fallback = resolveFallback(fallbackDataRef.current);
-      if (fallback !== null) setData(fallback);
-    } finally {
-      if (!controller.signal.aborted) setIsLoading(false);
-    }
-  }, [enabled]);
-
-  useEffect(() => {
-    execute();
-    return () => abortRef.current?.abort();
-  }, [execute, stableKey]);
-
-  return { data, isLoading, error, refetch: execute };
+  return {
+    data: query.data ?? null,
+    isLoading: query.isFetching,
+    error: query.error,
+    refetch: async () => {
+      await query.refetch();
+    },
+  };
 }

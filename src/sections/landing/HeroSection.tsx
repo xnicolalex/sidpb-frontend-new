@@ -1,15 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import { SearchForm } from "@/modules/search/components/SearchForm";
 import { AdvancedSearchToggle } from "@/modules/search/components/AdvancedSearchToggle";
 import { useSearchNavigation } from "@/modules/search/hooks/useDashboardSearch";
-import { buildSearchParams } from "@/modules/search/utils/buildSearchParams";
 
 export function HeroSection() {
-
-const { navigateToSearch } = useSearchNavigation();
+  const { navigateToSearch } = useSearchNavigation();
   
   return (
     <section className="border-t border-border bg-white">

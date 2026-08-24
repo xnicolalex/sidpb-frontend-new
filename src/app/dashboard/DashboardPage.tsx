@@ -1,23 +1,21 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { parseAsString, useQueryState } from "nuqs";
 
 import { DashboardShell } from "@/components/layout/DashboardShell";
-import { DashboardFooterSection } from "@/sections/dashboard/DashboardFooterSection";
 import { DashboardContent } from "@/modules/dashboard/components/DashboardContent";
 import { DashboardHeader } from "@/modules/dashboard/components/DashboardHeader";
-import { useOccurrences } from "@/features/occurrences/hooks/useOccurrences";
+import { DashboardMap } from "@/modules/dashboard/components/DashboardMap";
+import { useMapController } from "@/modules/map/hooks/useMapController";
+import type { MapController } from "@/modules/map/types/map-controller.types";
+import { useOccurrences } from "@/modules/occurrences/hooks/useOccurrences";
+import { DashboardFooterSection } from "@/sections/dashboard/DashboardFooterSection";
 
 export default function DashboardPage() {
-  const searchParams = useSearchParams();
+  const map: MapController = useMapController();
+  const [search] = useQueryState("search", parseAsString.withDefault(""));
 
-  const search = searchParams.get("search") ?? "";
-
-  const {
-    data: occurrences,
-    isLoading,
-    error,
-  } = useOccurrences({
+  const { data: occurrences } = useOccurrences({
     filters: {
       search,
     },
@@ -25,15 +23,11 @@ export default function DashboardPage() {
 
   return (
     <DashboardShell
-        header={<DashboardHeader />}
-        footer={<DashboardFooterSection />}
+      header={<DashboardHeader />}
+      footer={<DashboardFooterSection />}
     >
-
-        <DashboardContent>
-
-            {/* Leaflet */}
-
-  
+      <DashboardContent map={map}>
+        <DashboardMap map={map} occurrences={occurrences} />
       </DashboardContent>
     </DashboardShell>
   );

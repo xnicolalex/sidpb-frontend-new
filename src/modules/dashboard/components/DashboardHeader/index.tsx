@@ -1,32 +1,26 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { parseAsString, useQueryState } from "nuqs";
 
-import { useSearchNavigation } from "@/modules/search/hooks/useDashboardSearch";
 import { SearchForm } from "@/modules/search/components/SearchForm";
 
 export function DashboardHeader() {
-  const { navigateToSearch } = useSearchNavigation();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const search = searchParams.get("search") ?? "";
+  const [search, setSearch] = useQueryState(
+    "search",
+    parseAsString.withDefault("")
+  );
 
   function handleSearch(value: string) {
-    if (!value.trim()) {
-      router.push("/sidpb/dashboard");
-      return;
-    }
-
-    router.push(
-      `/sidpb/dashboard?search=${encodeURIComponent(value)}`
-    );
+    const nextSearch = value.trim();
+    void setSearch(nextSearch.length > 0 ? nextSearch : null);
   }
 
   return (
-    <header className="flex h-16 items-center border-b border-border bg-background px-6">
-      <div className="mr-8 flex shrink-0 items-center">
+    <header className="grid h-16 grid-cols-[1fr_auto_1fr] items-center border-b border-border bg-background px-6">
+      <div className="justify-self-start">
         <Image
           src="/sidpb/logo.svg"
           alt="SIDPB"
@@ -36,12 +30,22 @@ export function DashboardHeader() {
         />
       </div>
 
-      <div className="w-full max-w-3xl">
+      <div className="w-[min(48rem,50vw)] justify-self-center">
         <SearchForm
           initialValue={search}
-          onSearch={navigateToSearch}
+          onSearch={handleSearch}
           placeholder="Pesquise por doença, parasito, hospedeiro..."
         />
+      </div>
+
+      <div className="justify-self-end">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar para início
+        </Link>
       </div>
     </header>
   );

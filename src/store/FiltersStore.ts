@@ -1,28 +1,40 @@
-import { useSyncExternalStore } from "react";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-type GeographicLevel = "country" | "state" | "city";
+export type GeographicLevel = "country" | "state" | "city";
 
 interface FiltersState {
   geographicLevel: GeographicLevel;
   selectedRegion: string | null;
+
   selectedDiseases: string[];
   selectedVectors: string[];
   selectedHosts: string[];
+
   visibleLayers: string[];
   showLegend: boolean;
+
   setGeographicLevel: (level: GeographicLevel) => void;
   setSelectedRegion: (region: string | null) => void;
+
+  setSelectedDiseases: (diseases: string[]) => void;
+  setSelectedVectors: (vectors: string[]) => void;
+  setSelectedHosts: (hosts: string[]) => void;
+
   toggleDisease: (disease: string) => void;
+  toggleVector: (vector: string) => void;
+  toggleHost: (host: string) => void;
+
   toggleLayer: (layerId: string) => void;
+
   setShowLegend: (show: boolean) => void;
+
   resetFilters: () => void;
 }
 
-type Listener = () => void;
-
 const STORAGE_KEY = "sidpb-filters-storage";
 
-type FilterValues = Pick<
+type PersistedState = Pick<
   FiltersState,
   | "geographicLevel"
   | "selectedRegion"
@@ -33,103 +45,112 @@ type FilterValues = Pick<
   | "showLegend"
 >;
 
-const initialState: FilterValues = {
+const initialState: PersistedState = {
   geographicLevel: "country",
   selectedRegion: null,
+
   selectedDiseases: [],
   selectedVectors: [],
   selectedHosts: [],
+
   visibleLayers: ["occurrences"],
+
   showLegend: true,
 };
 
-let state: FilterValues = initialState;
-const listeners = new Set<Listener>();
-let cachedSnapshot: FiltersState;
-
-function getPersistedState() {
-  if (typeof window === "undefined") return null;
-
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (!stored) return null;
-
-    const parsed = JSON.parse(stored) as { state?: Partial<FilterValues> };
-    return parsed.state ?? parsed;
-  } catch {
-    return null;
-  }
+function toggleArrayItem(list: string[], value: string) {
+  return list.includes(value)
+    ? list.filter((item) => item !== value)
+    : [...list, value];
 }
 
-function persistState() {
-  if (typeof window === "undefined") return;
+export const useFiltersStore = create<FiltersState>()(
+  persist(
+    (set) => ({
+      ...initialState,
 
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ state }));
-}
+      setGeographicLevel: (level) =>
+        set({
+          geographicLevel: level,
+        }),
 
-function emit(nextState: FilterValues) {
-  state = nextState;
-  cachedSnapshot = createSnapshot();
-  persistState();
-  listeners.forEach((listener) => listener());
-}
+      setSelectedRegion: (region) =>
+        set({
+          selectedRegion: region,
+        }),
 
-function setState(partial: Partial<FilterValues>) {
-  emit({ ...state, ...partial });
-}
+      setSelectedDiseases: (selectedDiseases) =>
+        set({
+          selectedDiseases,
+        }),
 
-function ensureHydrated() {
-  const persisted = getPersistedState();
-  if (persisted) {
-    state = { ...state, ...persisted };
-    cachedSnapshot = createSnapshot();
-  }
-}
+      setSelectedVectors: (selectedVectors) =>
+        set({
+          selectedVectors,
+        }),
 
-const actions = {
-  setGeographicLevel: (level: GeographicLevel) => setState({ geographicLevel: level }),
-  setSelectedRegion: (region: string | null) => setState({ selectedRegion: region }),
-  toggleDisease: (disease: string) =>
-    setState({
-      selectedDiseases: state.selectedDiseases.includes(disease)
-        ? state.selectedDiseases.filter((item) => item !== disease)
-        : [...state.selectedDiseases, disease],
+      setSelectedHosts: (selectedHosts) =>
+        set({
+          selectedHosts,
+        }),
+
+      toggleDisease: (disease) =>
+        set((state) => ({
+          selectedDiseases: toggleArrayItem(
+            state.selectedDiseases,
+            disease
+          ),
+        })),
+
+      toggleVector: (vector) =>
+        set((state) => ({
+          selectedVectors: toggleArrayItem(
+            state.selectedVectors,
+            vector
+          ),
+        })),
+
+      toggleHost: (host) =>
+        set((state) => ({
+          selectedHosts: toggleArrayItem(
+            state.selectedHosts,
+            host
+          ),
+        })),
+
+      toggleLayer: (layerId) =>
+        set((state) => ({
+          visibleLayers: toggleArrayItem(
+            state.visibleLayers,
+            layerId
+          ),
+        })),
+
+      setShowLegend: (showLegend) =>
+        set({
+          showLegend,
+        }),
+
+      resetFilters: () =>
+        set({
+          ...initialState,
+        }),
     }),
-  toggleLayer: (layerId: string) =>
-    setState({
-      visibleLayers: state.visibleLayers.includes(layerId)
-        ? state.visibleLayers.filter((item) => item !== layerId)
-        : [...state.visibleLayers, layerId],
-    }),
-  setShowLegend: (show: boolean) => setState({ showLegend: show }),
-  resetFilters: () =>
-    setState({
-      selectedDiseases: [],
-      selectedVectors: [],
-      selectedHosts: [],
-      geographicLevel: "country",
-      selectedRegion: null,
-    }),
-};
+    {
+      name: STORAGE_KEY,
 
-function createSnapshot(): FiltersState {
-  return { ...state, ...actions };
-}
+      partialize: (state) => ({
+        geographicLevel: state.geographicLevel,
+        selectedRegion: state.selectedRegion,
 
-cachedSnapshot = createSnapshot();
+        selectedDiseases: state.selectedDiseases,
+        selectedVectors: state.selectedVectors,
+        selectedHosts: state.selectedHosts,
 
-const getSnapshot = (): FiltersState => cachedSnapshot;
-const getServerSnapshot = getSnapshot;
+        visibleLayers: state.visibleLayers,
 
-function subscribe(listener: Listener) {
-  ensureHydrated();
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
-export function useFiltersStore(): FiltersState;
-export function useFiltersStore<T>(selector: (state: FiltersState) => T): T;
-export function useFiltersStore<T>(selector?: (state: FiltersState) => T) {
-  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  return selector ? selector(snapshot) : snapshot;
-}
+        showLegend: state.showLegend,
+      }),
+    }
+  )
+);

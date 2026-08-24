@@ -2,6 +2,8 @@
 // Observações: articles preenchidos com referências do artigo de revisão anexado; uma mesma fonte pode aparecer em várias ocorrências.
 // Longitude/latitude estavam nulas no SQL; coordenadas abaixo são aproximações por cidade/UF quando possível.
 
+import type { Occurrence } from "@/entities/occurrence/occurrence.types";
+
 export const mockOccurrences: Occurrence[] = [
   {
     id: "occ-001",

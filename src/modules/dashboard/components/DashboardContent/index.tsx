@@ -1,14 +1,29 @@
-import { MapContainer } from "@/modules/map/components/MapContainer";
+"use client";
 
-export function DashboardContent() {
+import type { ReactNode } from "react";
+
+import { DashboardSidebar } from "../DashboardSidebar";
+import { DashboardInspector } from "../DashboardInspector";
+import type { MapController } from "@/modules/map/types/map-controller.types";
+
+interface DashboardContentProps {
+  children: React.ReactNode;
+  map: MapController;
+}
+export function DashboardContent({
+  children,
+  map,
+}: DashboardContentProps) {
   return (
-    <section className="relative flex-1 overflow-hidden">
+    <section className="flex flex-1 overflow-hidden">
 
-      <MapContainer>
+      <DashboardSidebar map={map} />
 
-        {/* Leaflet */}
-        <div />
-      </MapContainer>
+      <div className="relative flex-1">
+        {children}
+      </div>
+
+      <DashboardInspector />
 
     </section>
   );

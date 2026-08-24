@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { AppProviders } from './providers'
 
 export const metadata: Metadata = {
   title: 'SIDPB - Sistema de Informação de Doenças Parasitárias no Brasil',
@@ -15,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className="font-sans antialiased">
-        {children}
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   )
