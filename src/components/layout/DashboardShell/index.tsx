@@ -1,25 +1,29 @@
 interface DashboardShellProps {
-  header?: React.ReactNode;
-  footer?: React.ReactNode;
+  header: React.ReactNode;
   children: React.ReactNode;
+  footer?: React.ReactNode;
 }
 
 export function DashboardShell({
   header,
-  footer,
   children,
+  footer,
 }: DashboardShellProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-
-      {header}
+    <div className="flex h-screen flex-col overflow-hidden bg-background">
+      <div className="shrink-0">
+        {header}
+      </div>
 
       <main className="relative flex min-h-0 flex-1 overflow-hidden">
         {children}
       </main>
 
-      {footer}
-
+      {footer && (
+        <div className="shrink-0">
+          {footer}
+        </div>
+      )}
     </div>
   );
 }

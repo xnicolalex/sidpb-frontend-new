@@ -5,24 +5,31 @@ import { create } from "zustand";
 
 import type { Occurrence } from "@/entities/occurrence/occurrence.types";
 
+import {
+  MIN_ZOOM,
+  MAX_ZOOM,
+} from "../components/LeafletMap/map-zoom";
+
 export type MapView = "street" | "satellite";
 
 export const DEFAULT_CENTER: [number, number] = [-14.235, -51.925];
 export const DEFAULT_ZOOM = 4;
 
-export const MIN_ZOOM = 4;
-export const MAX_ZOOM = 12;
 
 interface MapStore {
   map: L.Map | null;
 
   mapView: MapView;
 
+  currentZoom: number;
+
   legendVisible: boolean;
 
   selectedOccurrence: Occurrence | null;
 
   registerMap(map: L.Map): void;
+
+  setCurrentZoom(zoom: number): void;
 
   zoomIn(): void;
   zoomOut(): void;
@@ -56,7 +63,9 @@ export const useMapStore = create<MapStore>((set, get) => ({
 
   mapView: "street",
 
-  legendVisible: true,
+  currentZoom: DEFAULT_ZOOM,
+
+  legendVisible: false,
 
   selectedOccurrence: null,
 
@@ -65,6 +74,12 @@ export const useMapStore = create<MapStore>((set, get) => ({
     map.setMaxZoom(MAX_ZOOM);
 
     set({ map });
+  },
+
+  setCurrentZoom(zoom) {
+    set({
+      currentZoom: zoom,
+    });
   },
 
   zoomIn() {

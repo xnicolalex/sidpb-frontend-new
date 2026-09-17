@@ -1,7 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import type { DashboardToolbarPanel } from "@/modules/dashboard/components/DashboardToolbar"
+
+export type DashboardToolbarPanel =
+  | "articles"
+  | "vectors"
+  | "hosts"
+  | "filters"
+  | null
 
 export function useDashboardPanels() {
   const [activePanel, setActivePanel] = useState<DashboardToolbarPanel>(null)

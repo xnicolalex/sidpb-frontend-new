@@ -13,7 +13,7 @@ import { ZoomControl } from "./ZoomControl";
 
 import { useMapStore } from "@/modules/map/store/mapStore";
 
-export function SidebarTools() {
+export function LeftSidebarTools() {
   const zoomIn = useMapStore((state) => state.zoomIn);
   const zoomOut = useMapStore((state) => state.zoomOut);
 

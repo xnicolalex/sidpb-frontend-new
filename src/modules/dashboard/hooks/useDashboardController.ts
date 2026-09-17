@@ -3,7 +3,13 @@
 import { useState } from "react";
 
 import type { Occurrence } from "@/entities/occurrence/occurrence.types";
-import type { SideboardToolbarPanel } from "@/modules/dashboard/components/SideboardToolbar";
+
+export type SideboardToolbarPanel =
+  | "articles"
+  | "vectors"
+  | "hosts"
+  | "filters"
+  | null;
 
 export function useDashboardController() {
   const [activePanel, setActivePanel] =

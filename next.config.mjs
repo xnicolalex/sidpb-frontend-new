@@ -5,6 +5,16 @@ const basePath =
 const nextConfig = {
   basePath: "/sidpb",
   trailingSlash: true,
+
+  allowedDevOrigins: [
+    "http://192.168.200.182:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "192.168.200.182",
+    "localhost",
+    "127.0.0.1",
+  ],
+  
   typescript: {
     ignoreBuildErrors: true,
   },

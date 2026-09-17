@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { LegendItem } from "@/modules/map/components/LegendItem"
+import { LegendItem } from "@/modules/map/components/MapLegend/LegendItem"
 
 interface MapLegendProps {
   onClose: () => void

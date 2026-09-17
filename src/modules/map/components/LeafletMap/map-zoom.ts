@@ -1,6 +1,8 @@
 export const MIN_ZOOM = 4;
 
-export const MAX_ZOOM = 12;
+export const MAX_ZOOM = 20;
+
+export const SATELLITE_MAX_ZOOM = 19;
 
 export const CLUSTER_MAX_ZOOM = 11;
 

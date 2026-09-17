@@ -19,8 +19,8 @@ export function DashboardHeader() {
   }
 
   return (
-    <header className="grid h-16 grid-cols-[1fr_auto_1fr] items-center border-b border-border bg-background px-6">
-      <div className="justify-self-start">
+    <header className="grid h-16 grid-cols-[18rem_minmax(0,1fr)_24rem] items-center border-b border-border bg-background">
+      <div className="flex items-center px-6">
         <Image
           src="/sidpb/logo.svg"
           alt="SIDPB"
@@ -30,15 +30,17 @@ export function DashboardHeader() {
         />
       </div>
 
-      <div className="w-[min(48rem,50vw)] justify-self-center">
-        <SearchForm
-          initialValue={search}
-          onSearch={handleSearch}
-          placeholder="Pesquise por doença, parasito, hospedeiro..."
-        />
+      <div className="flex justify-center px-6">
+        <div className="w-full max-w-3xl">
+          <SearchForm
+            initialValue={search}
+            onSearch={handleSearch}
+            placeholder="Pesquise por doença, parasito, hospedeiro..."
+          />
+        </div>
       </div>
 
-      <div className="justify-self-end">
+      <div className="flex justify-end px-6">
         <Link
           href="/"
           className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"

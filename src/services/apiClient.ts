@@ -12,9 +12,13 @@ export class ApiError extends Error {
   }
 }
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? ""
+export const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL ??
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  ""
+).replace(/\/$/, "")
 export const SHOULD_USE_MOCKS =
-  process.env.NEXT_PUBLIC_USE_API_MOCKS === "true" || API_BASE_URL.length === 0
+  process.env.NEXT_PUBLIC_USE_API_MOCKS === "true"
 
 type QueryValue = string | number | boolean | null | undefined | Array<string | number | boolean>
 
@@ -53,11 +57,11 @@ function unwrapEnvelope<T>(payload: ApiEnvelope<T>): T {
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   if (!API_BASE_URL) {
-    throw new ApiError("NEXT_PUBLIC_API_BASE_URL nao foi configurado.", 0)
+    throw new ApiError("NEXT_PUBLIC_API_URL nao foi configurado.", 0)
   }
 
   const controller = new AbortController()
-  const timeout = window.setTimeout(() => controller.abort(), options.timeoutMs ?? 15000)
+  const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? 15000)
 
   try {
     const response = await fetch(buildUrl(path, options.params), {
@@ -84,6 +88,6 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
     return unwrapEnvelope<T>(payload as ApiEnvelope<T>)
   } finally {
-    window.clearTimeout(timeout)
+    clearTimeout(timeout)
   }
 }

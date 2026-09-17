@@ -31,6 +31,7 @@ export function getMockOccurrences(filters: OccurrenceFilters = {}): OccurrenceF
       includesAny(properties.disease, filters.diseases) &&
       includesAny(properties.vector, filters.vectors) &&
       includesAny(properties.host, filters.hosts) &&
+      includesAny(properties.state, filters.states) &&
       (!filters.articles?.length ||
         properties.articles.some((article) => filters.articles?.includes(article.id))) &&
       (!filters.search ||

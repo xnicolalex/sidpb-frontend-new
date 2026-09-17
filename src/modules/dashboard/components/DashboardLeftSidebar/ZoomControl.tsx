@@ -37,7 +37,7 @@ export function ZoomControl({
           "
         >
           <Plus className="h-4 w-4" />
-          <span>Aumentar</span>
+          <span></span>
         </button>
 
         <button
@@ -55,7 +55,7 @@ export function ZoomControl({
             hover:bg-muted
           "
         >
-          <span>Diminuir</span>
+          <span></span>
           <Minus className="h-4 w-4" />
         </button>
 

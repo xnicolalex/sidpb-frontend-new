@@ -17,13 +17,15 @@ import { MapInstance } from "./MapInstance";
 import { MapMover } from "./MapMover";
 import { MapTelemetry } from "./MapTelemetry";
 import { defaultIcon } from "./map-icons";
-import { SearchMarker } from "./SearchMarker";
+import { SearchMarker } from "./SearchedMarker";
 import {
   MIN_ZOOM,
   MAX_ZOOM,
+  SATELLITE_MAX_ZOOM,
   CLUSTER_MAX_ZOOM,
   getClusterRadiusByZoom,
 } from "./map-zoom";
+import { MapZoomTracker } from "./MapZoomTracker";
 import { OccurrenceMarker } from "./OccurrenceMarker";
 import { hasSameCoordinates } from "./occurrence-cluster";
 
@@ -55,6 +57,9 @@ export default function LeafletMap({
 
   const legendVisible = useMapStore((state) => state.legendVisible);
   const toggleLegend = useMapStore((state) => state.toggleLegend);
+
+  const currentZoom = useMapStore((state) => state.currentZoom);
+  const setCurrentZoom = useMapStore((state) => state.setCurrentZoom);
 
   const getClusterOccurrences = (cluster: MarkerClusterLike) => {
     return cluster
@@ -113,28 +118,35 @@ export default function LeafletMap({
         scrollWheelZoom={true}
         zoomControl={false}
         worldCopyJump={true}
-        zoomSnap={0.25}
-        zoomDelta={0.5}
+        zoomSnap={1}
+        zoomDelta={1}
         className="h-full w-full"
         style={{ height: "100%", width: "100%", zIndex: 0 }}
       >
         <MapInstance onReady={onMapReady} />
 
+        <MapZoomTracker onZoomChange={setCurrentZoom} />
+
         <TileLayer
-          attribution={
-            mapView === "satellite"
-              ? "Tiles &copy; Esri"
-              : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          }
-          url={
-            mapView === "satellite"
-              ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          }
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxNativeZoom={19}
+          maxZoom={MAX_ZOOM}
           noWrap={false}
         />
 
+        {mapView === "satellite" && (
+          <TileLayer
+            attribution="Tiles &copy; Esri"
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            maxNativeZoom={SATELLITE_MAX_ZOOM}
+            maxZoom={SATELLITE_MAX_ZOOM}
+            noWrap={false}
+          />
+        )}
+
         <MapMover center={center} zoom={zoom} bounds={bounds} />
+
         <MapTelemetry
           onMouseCoordinateChange={onMouseCoordinateChange}
           onScaleChange={onScaleChange}
